@@ -1,0 +1,193 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum ShipmentStatus {
+  REQUESTED
+  DISPATCHED
+  RECEIVED
+}
+
+enum PersonnelStatus {
+  AT_STATION
+  IN_TRANSIT
+  ON_EXPEDITION
+}
+
+enum IncidentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IncidentStatus {
+  OPEN
+  RESPONDING
+  RESOLVED
+}
+
+enum MovementType {
+  OPENING_STOCK
+  CONSUMPTION
+  SHIPMENT_RECEIPT
+  ADJUSTMENT
+}
+
+model Station {
+  id           String        @id @default(uuid())
+  identifier   String        @unique // e.g. "MAITRI"
+  name         String        // "Maitri Station"
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  supplies     Supply[]
+  shipments    Shipment[]
+  expeditions  Expedition[]
+  personnel    Personnel[]
+  incidents    Incident[]
+}
+
+model Supply {
+  id                                 String              @id @default(uuid())
+  stationId                          String
+  station                            Station             @relation(fields: [stationId], references: [id], onDelete: Restrict)
+  name                               String              // e.g. "Food Packs"
+  unit                               String              // e.g. "packs", "liters"
+  onHandQuantity                     Decimal             @db.Decimal(12, 2)
+  configuredDailyConsumption         Decimal             @db.Decimal(12, 2)
+  perPersonDailyExpeditionConsumption Decimal?           @db.Decimal(12, 2)
+  isActive                           Boolean             @default(true)
+  createdAt                          DateTime            @default(now())
+  updatedAt                          DateTime            @updatedAt
+
+  consumptionEvents                  ConsumptionEvent[]
+  shipmentItems                      ShipmentItem[]
+  movements                          InventoryMovement[]
+
+  @@unique([stationId, name])
+  @@index([stationId, isActive])
+}
+
+model ConsumptionEvent {
+  id                 String    @id // Client-generated operation UUID
+  supplyId           String
+  supply             Supply    @relation(fields: [supplyId], references: [id], onDelete: Restrict)
+  quantity           Decimal   @db.Decimal(12, 2)
+  occurredAt         DateTime  // Client device timestamp
+  receivedAt         DateTime  @default(now()) // Server timestamp
+  requestFingerprint String    // SHA-256 canonical hash
+  createdAt          DateTime  @default(now())
+
+  @@index([supplyId, occurredAt])
+  @@index([requestFingerprint])
+}
+
+model Shipment {
+  id             String          @id @default(uuid())
+  stationId      String
+  station        Station         @relation(fields: [stationId], references: [id], onDelete: Restrict)
+  status         ShipmentStatus  @default(REQUESTED)
+  idempotencyKey String          @unique // UUID for request creation
+  eta            DateTime?       // Usable ETA for committed arrival projection
+  requestedAt    DateTime        @default(now())
+  dispatchedAt   DateTime?
+  receivedAt     DateTime?
+  notes          String?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  items          ShipmentItem[]
+
+  @@index([stationId, status])
+}
+
+model ShipmentItem {
+  id         String   @id @default(uuid())
+  shipmentId String
+  shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  supplyId   String
+  supply     Supply   @relation(fields: [supplyId], references: [id], onDelete: Restrict)
+  quantity   Decimal  @db.Decimal(12, 2)
+
+  @@unique([shipmentId, supplyId])
+}
+
+model InventoryMovement {
+  id                  String       @id @default(uuid())
+  supplyId            String
+  supply              Supply       @relation(fields: [supplyId], references: [id], onDelete: Restrict)
+  signedQuantityChange Decimal     @db.Decimal(12, 2) // Negative for consumption, positive for receipt
+  movementType        MovementType
+  sourceReference     String       // e.g. "consumption:<uuid>" or "shipment:<shipmentId>:<supplyId>"
+  occurredAt          DateTime     @default(now())
+
+  @@unique([sourceReference, movementType])
+  @@index([supplyId, occurredAt])
+}
+
+model Expedition {
+  id               String   @id @default(uuid())
+  stationId        String
+  station          Station  @relation(fields: [stationId], references: [id], onDelete: Restrict)
+  name             String   // e.g. "Queen Maud Land Traverse"
+  additionalPeople Int
+  startDate        DateTime
+  endDate          DateTime
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  personnel        Personnel[]
+
+  @@index([stationId, startDate, endDate])
+}
+
+model Personnel {
+  id           String          @id @default(uuid())
+  stationId    String
+  station      Station         @relation(fields: [stationId], references: [id], onDelete: Restrict)
+  name         String
+  role         String
+  status       PersonnelStatus @default(AT_STATION)
+  expeditionId String?
+  expedition   Expedition?     @relation(fields: [expeditionId], references: [id], onDelete: SetNull)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  movements    PersonnelMovement[]
+
+  @@index([stationId, status])
+}
+
+model PersonnelMovement {
+  id          String          @id @default(uuid())
+  personnelId String
+  personnel   Personnel       @relation(fields: [personnelId], references: [id], onDelete: Cascade)
+  fromStatus  PersonnelStatus
+  toStatus    PersonnelStatus
+  note        String?
+  occurredAt  DateTime        @default(now())
+
+  @@index([personnelId, occurredAt])
+}
+
+model Incident {
+  id          String           @id @default(uuid())
+  stationId   String
+  station     Station          @relation(fields: [stationId], references: [id], onDelete: Restrict)
+  title       String
+  description String?
+  location    String?
+  severity    IncidentSeverity
+  status      IncidentStatus   @default(OPEN)
+  reportedAt  DateTime         @default(now())
+  resolvedAt  DateTime?
+  updatedAt   DateTime         @updatedAt
+
+  @@index([stationId, status])
+}

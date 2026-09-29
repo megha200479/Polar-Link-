@@ -1,0 +1,9 @@
+{
+  "name": "PolarLink - Station Supply Logistics",
+  "short_name": "PolarLink",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b192c",
+  "theme_color": "#0b192c",
+  "description": "Polar station supply logistics and asset management system for Maitri Station."
+}

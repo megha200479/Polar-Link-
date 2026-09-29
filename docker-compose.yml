@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: polarlink-postgres
+    restart: always
+    environment:
+      POSTGRES_USER: polaruser
+      POSTGRES_PASSWORD: polarpassword
+      POSTGRES_DB: polarlink
+    ports:
+      - "5432:5432"
+    volumes:
+      - polarlink-pgdata:/var/lib/postgresql/data
+
+volumes:
+  polarlink-pgdata:

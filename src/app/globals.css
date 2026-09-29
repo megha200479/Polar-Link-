@@ -1,1 +1,506 @@
 @import "tailwindcss";
+
+/* ── PolarLink Design System — Operations Console ── */
+
+@theme {
+  /* Neutrals */
+  --color-polar-900: #0e1a2b;
+  --color-polar-850: #14243a;
+  --color-polar-800: #1c3049;
+  --color-polar-700: #33475e;
+  --color-polar-600: #52697f;
+  --color-polar-500: #6b8299;
+  --color-polar-400: #8fa1b3;
+  --color-polar-300: #c4cdd6;
+  --color-polar-200: #e3e7ea;
+  --color-polar-100: #f6f7f9;
+
+  /* Single accent */
+  --color-cyan-400: #1d7a8c;
+  --color-cyan-500: #0f6273;
+  --color-cyan-600: #0a4b59;
+
+  --color-emerald-400: #1f7a4a;
+  --color-emerald-500: #166534;
+
+  --color-amber-400: #b45309;
+  --color-amber-500: #92400e;
+
+  --color-rose-400: #b91c1c;
+  --color-rose-500: #991b1b;
+
+  --font-sans: 'IBM Plex Sans', 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ── Global reset & base ── */
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--color-polar-100);
+  color: var(--color-polar-900);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-polar-300);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-polar-400);
+}
+
+/* ── Cards (flat, real border, no blur) ── */
+.glass-card {
+  background: #ffffff;
+  border: 1px solid var(--color-polar-200);
+  border-radius: 8px;
+  box-shadow: 0 1px 2px rgba(14, 26, 43, 0.06);
+}
+
+.glass-card-sm {
+  background: #ffffff;
+  border: 1px solid var(--color-polar-200);
+  border-radius: 6px;
+}
+
+/* ── Buttons (flat fill, no gradient/glow) ── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  text-decoration: none;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--color-cyan-500);
+  color: #ffffff;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-cyan-600);
+}
+
+.btn-success {
+  background: var(--color-emerald-500);
+  color: #ffffff;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #14532d;
+}
+
+.btn-warning {
+  background: var(--color-amber-500);
+  color: #ffffff;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: #78350f;
+}
+
+.btn-danger {
+  background: var(--color-rose-500);
+  color: #ffffff;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #7f1d1d;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--color-polar-700);
+  border: 1px solid var(--color-polar-300);
+}
+
+.btn-ghost:hover:not(:disabled) {
+  background: var(--color-polar-100);
+  border-color: var(--color-polar-400);
+}
+
+.btn-sm {
+  padding: 6px 14px;
+  font-size: 13px;
+  border-radius: 5px;
+}
+
+/* ── Status badges (flat, left-accent style, no glow) ── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-left: 3px solid transparent;
+}
+
+.badge-critical {
+  background: #fef2f2;
+  color: var(--color-rose-400);
+  border-left-color: var(--color-rose-400);
+}
+
+.badge-low {
+  background: #fffbeb;
+  color: var(--color-amber-400);
+  border-left-color: var(--color-amber-400);
+}
+
+.badge-ok {
+  background: #f0fdf4;
+  color: var(--color-emerald-400);
+  border-left-color: var(--color-emerald-400);
+}
+
+.badge-pending {
+  background: var(--color-polar-100);
+  color: var(--color-polar-600);
+  border-left-color: var(--color-polar-400);
+}
+
+.badge-dispatched {
+  background: #eff8fa;
+  color: var(--color-cyan-400);
+  border-left-color: var(--color-cyan-400);
+}
+
+.badge-received {
+  background: #f0fdf4;
+  color: var(--color-emerald-400);
+  border-left-color: var(--color-emerald-400);
+}
+
+/* ── Form inputs ── */
+.input {
+  width: 100%;
+  padding: 9px 12px;
+  background: #ffffff;
+  border: 1px solid var(--color-polar-300);
+  border-radius: 6px;
+  color: var(--color-polar-900);
+  font-size: 14px;
+  transition: border-color 0.15s;
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--color-polar-500);
+}
+
+.input:focus {
+  border-color: var(--color-cyan-500);
+  box-shadow: 0 0 0 2px rgba(15, 98, 115, 0.12);
+}
+
+.input-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-polar-600);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-bottom: 6px;
+}
+
+/* ── Animations (kept subtle) ── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out both;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.25s ease-out both;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 1.6s ease-in-out infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* stagger children */
+.stagger-children> :nth-child(1) {
+  animation-delay: 0ms;
+}
+
+.stagger-children> :nth-child(2) {
+  animation-delay: 40ms;
+}
+
+.stagger-children> :nth-child(3) {
+  animation-delay: 80ms;
+}
+
+.stagger-children> :nth-child(4) {
+  animation-delay: 120ms;
+}
+
+.stagger-children> :nth-child(5) {
+  animation-delay: 160ms;
+}
+
+.stagger-children> :nth-child(6) {
+  animation-delay: 200ms;
+}
+
+/* ── Skeleton loading ── */
+.skeleton {
+  background: linear-gradient(90deg,
+      var(--color-polar-200) 25%,
+      var(--color-polar-100) 50%,
+      var(--color-polar-200) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 6px;
+}
+
+/* ── Stock bar ── */
+.stock-bar-container {
+  height: 6px;
+  background: var(--color-polar-200);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stock-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease-out;
+}
+
+/* ── Toast notifications ── */
+.toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  padding: 12px 18px;
+  border-radius: 6px;
+  background: #ffffff;
+  border: 1px solid var(--color-polar-200);
+  box-shadow: 0 4px 12px rgba(14, 26, 43, 0.12);
+  animation: fadeInUp 0.25s ease-out both;
+  max-width: 400px;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-left: 3px solid transparent;
+}
+
+.toast-success {
+  border-left-color: var(--color-emerald-400);
+  color: var(--color-emerald-400);
+}
+
+.toast-error {
+  border-left-color: var(--color-rose-400);
+  color: var(--color-rose-400);
+}
+
+.toast-info {
+  border-left-color: var(--color-cyan-400);
+  color: var(--color-cyan-400);
+}
+
+/* ── Modal overlay ── */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(14, 26, 43, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: #ffffff;
+  animation: fadeInUp 0.2s ease-out;
+}
+
+/* ── Online indicator ── */
+.online-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-emerald-400);
+}
+
+.offline-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-amber-400);
+  animation: pulse-glow 1.6s ease-in-out infinite;
+}
+
+/* ── Nav tabs ── */
+.nav-tab {
+  padding: 10px 18px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-polar-500);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-tab:hover {
+  color: var(--color-polar-900);
+}
+
+.nav-tab-active {
+  color: var(--color-cyan-500);
+  border-bottom-color: var(--color-cyan-500);
+}
+
+/* ── Responsive grid ── */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+
+/* ── Table-like rows ── */
+.data-row {
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--color-polar-200);
+  transition: background 0.15s ease;
+}
+
+.data-row:hover {
+  background: var(--color-polar-100);
+}
+
+.data-row:last-child {
+  border-bottom: none;
+}
+
+/* ── Timeline / movement ledger ── */
+.timeline-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.timeline-line {
+  width: 2px;
+  flex-shrink: 0;
+  background: var(--color-polar-200);
+}
